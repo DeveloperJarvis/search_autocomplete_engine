@@ -30,8 +30,50 @@
 # --------------------------------------------------
 # errors MODULE
 # --------------------------------------------------
-
+"""
+Custom exceptions for the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
 
+
+# ---------------------------
+# autocomplete engine error
+# ---------------------------
+class AutocompleteEngineError(Exception):
+    """
+    Base exception for all autocomplete engine errors.
+    """
+    pass
+
+
+# ---------------------------
+# validation errors
+# ---------------------------
+class InvalidQueryError(AutocompleteEngineError):
+    """Raised when a search query is invalid."""
+    pass
+
+
+class InvalidPrefixError(AutocompleteEngineError):
+    """Raised when an autocomplete prefix is invalid."""
+    pass
+
+
+class InvalidTopKError(AutocompleteEngineError):
+    """Raised when top_k pararmeter is invalid."""
+    pass
+
+
+# ---------------------------
+# core / storage errors
+# ---------------------------
+class TrieError(AutocompleteEngineError):
+    """Raised for trie-related errors."""
+    pass
+
+
+class StorageError(AutocompleteEngineError):
+    """Raised for frequency/ storage-related errors."""
+    pass

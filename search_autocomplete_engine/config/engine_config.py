@@ -30,8 +30,39 @@
 # --------------------------------------------------
 # engine_config MODULE
 # --------------------------------------------------
-
+"""
+Engine configuration module.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from dataclasses import dataclass
 
+from search_autocomplete_engine.config.defaults import (
+    DEFAULT_TOP_K,
+    DEFAULT_CASE_SENSITIVE,
+)
+from search_autocomplete_engine.exceptions.errors import InvalidTopKError
+
+
+# --------------------------------------------------
+# engine config
+# --------------------------------------------------
+@dataclass(frozen=True)
+class EngineConfig:
+    """
+    Configuration object for the autocomplete engine.
+
+    Attributes:
+        top_k (int): Number of suggestions to return
+        case_sensitive (bool): Case sensitivity flag
+    """
+
+    top_k: int = DEFAULT_TOP_K
+    case_sensitive: bool = DEFAULT_CASE_SENSITIVE
+
+    def __post_init__(self) -> None:
+        if self.top_k <= 0:
+            raise InvalidTopKError(
+                "top_k must be greater than zero"
+            )

@@ -30,8 +30,51 @@
 # --------------------------------------------------
 # frequency_store MODULE
 # --------------------------------------------------
-
+"""
+Frequency storage for search queries.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import Dict
 
+from search_autocomplete_engine.exceptions.errors import StorageError
+
+
+# --------------------------------------------------
+# frequency store
+# --------------------------------------------------
+class FrequencyStore:
+    """
+    In-memory store for query frequencies.
+    """
+
+    def __init__(self) -> None:
+        self._frequencies: Dict[str, int] = {}
+    
+    def increment(self, query: str) -> int:
+        """
+        Increment frquency count for a query.
+
+        Returns:
+            int: Updated frequency
+        """
+        if not query:
+            raise StorageError("Query cannot be empty")
+        
+        self._frequencies[query] = self._frequencies.get(
+                                                query, 0
+                                            ) + 1
+        return self._frequencies[query]
+    
+    def get(self, query: str) -> int:
+        """
+        Get frequemcy for a query.
+        """
+        return self._frequencies.get(query, 0)
+    
+    def all(self) -> Dict[str, int]:
+        """
+        Get all stored frequencies.
+        """
+        return dict(self._frequencies)

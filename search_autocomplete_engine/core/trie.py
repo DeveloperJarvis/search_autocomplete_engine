@@ -30,8 +30,51 @@
 # --------------------------------------------------
 # trie MODULE
 # --------------------------------------------------
-
+"""
+Trie implementation for prefix-based indexing.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from search_autocomplete_engine.models.trie_node import TrieNode
+from search_autocomplete_engine.exceptions.errors import TrieError
 
+
+# --------------------------------------------------
+# trie
+# --------------------------------------------------
+class Trie:
+    """
+    Trie data structure for storing query prefixes.
+    """
+
+    def __init__(self) -> None:
+        self.root = TrieNode()
+
+    def insert(self, query: str) -> None:
+        """
+        Insert a query into the table.
+        """
+        if not query:
+            raise TrieError("Cannot insert empty query")
+        
+        node = self.root
+        for char in query:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+            node.queries.add(query)
+        
+        node.is_end = True
+    
+    def get_queries_with_prefix(self, prefix: str) -> set[str]:
+        """
+        Retrieve all queries matching a prefix.
+        """
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return set()
+            node = node.children[char]
+        
+        return set(node.queries)

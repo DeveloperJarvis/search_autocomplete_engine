@@ -34,4 +34,28 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from search_autocomplete_engine.core.trie import Trie
+from search_autocomplete_engine.exceptions.errors import TrieError
 
+
+def test_trie_insert_and_retrieve():
+    trie = Trie()
+    trie.insert("apple")
+    trie.insert("app")
+    trie.insert("application")
+
+    results = trie.get_queries_with_prefix("app")
+    assert results == {"app", "apple", "application"}
+
+
+def test_trie_empty_insert_raises():
+    trie = Trie()
+    with pytest.raises(TrieError):
+        trie.insert("")
+
+
+def test_trie_prefix_not_found():
+    trie = Trie()
+    trie.insert("apple")
+    assert trie.get_queries_with_prefix("banana") == set()

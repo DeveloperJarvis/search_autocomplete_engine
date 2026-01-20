@@ -30,8 +30,25 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Utility helpers for the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .normalizer import normalize_query
+from .validators import (
+    validate_query, 
+    validate_prefix,
+    validate_top_k,
+)
+from .logging import get_logger
 
+
+__all__ = [
+    "normalize_query",
+    "validate_query",
+    "validate_prefix",
+    "validate_top_k",
+    "get_logger",
+]

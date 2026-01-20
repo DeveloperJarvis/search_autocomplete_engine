@@ -34,4 +34,29 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from search_autocomplete_engine.core.ranker import Ranker
+from search_autocomplete_engine.storage.frequency_store import FrequencyStore
 
+
+def test_ranker_orders_by_frequency_and_lex():
+    store = FrequencyStore()
+    store.increment("banana")
+    store.increment("apple")
+    store.increment("apple")
+    store.increment("application")
+    ranker = Ranker(store)
+
+    results = ranker.rank(
+        {"apple", "banana", "application"}, top_k=3
+    )
+    # frequency apple=2, banana=1, application=1
+    assert results == ["apple", "application", "banana"]
+
+
+def test_ranker_top_k_limit():
+    store = FrequencyStore()
+    for q in ["a", "b", "c", "d"]:
+        store.increment(q)
+    ranker = Ranker(store)
+    results = ranker.rank({"a", "b", "c", "d"}, top_k=2)
+    assert len(results) == 2

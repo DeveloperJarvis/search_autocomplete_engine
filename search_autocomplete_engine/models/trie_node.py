@@ -30,8 +30,28 @@
 # --------------------------------------------------
 # trie_node MODULE
 # --------------------------------------------------
-
+"""
+Trie node model.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import Dict, Set
 
+
+# --------------------------------------------------
+# trie node
+# --------------------------------------------------
+class TrieNode:
+    """
+    Node used in the Trie data structure.
+    """
+
+    __slots__ = ("children", "is_end", "queries")
+
+    def __init__(self) -> None:
+        self.children: Dict[str, "TrieNode"] = {}
+        self.is_end: bool = False
+
+        # Set of query strings passing through this node
+        self.queries: Set[str] = set()

@@ -30,8 +30,38 @@
 # --------------------------------------------------
 # frequency_demo MODULE
 # --------------------------------------------------
-
+"""
+Frequency ranking demostration.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from search_autocomplete_engine import (
+    AutocompleteEngine, EngineConfig
+)
 
+
+def main() -> None:
+    config = EngineConfig(top_k=3)
+    engine = AutocompleteEngine(config)
+
+    # Add queries with different frequencies
+    engine.add_query("python")
+    engine.add_query("python")
+    engine.add_query("python")
+
+    engine.add_query("pytest")
+    engine.add_query("pytest")
+
+    engine.add_query("pycharm")
+
+    prefix = "py"
+    suggestions = engine.suggest(prefix)
+
+    print("Frequency-based ranking:")
+    for s in suggestions:
+        print(f" - {s}")
+
+
+if __name__ == "__main__":
+    main()

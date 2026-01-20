@@ -1,0 +1,688 @@
+# main.py:
+"""
+CLI Entry point for Search Autocomplete Engine
+"""
+import argparse
+from search_autocomplete_engine.core.autocomplete import AutocompleteEngine
+from search_autocomplete_engine.config.engine_config import EngineConfig
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description="Search Autocomplete Engine CLI"
+    )
+    parser.add_argument(
+        "--query",
+        type=str,
+        required=True,
+        help="Input prefix for autocomplete",
+    )
+    parser.add_argument(
+        "--top-k",
+        type=int,
+        default=5,
+        help="Number of suggestions to return",
+    )
+    return parser.parse_args()
+def main():
+    args = parse_args()
+    print(f"Args: {args}\n")
+    config = EngineConfig(top_k=args.top_k)
+    engine = AutocompleteEngine(config=config)
+    engine.add_query("apple")
+    engine.add_query("app")
+    engine.add_query("application")
+    engine.add_query("banana")
+    engine.add_query("band")
+    engine.add_query("bandana")
+if __name__ == "__main__":
+    main()
+
+
+# setup.py:
+"""
+Search Autocomplete Engine
+Setup Script
+"""
+from setuptools import setup, find_packages
+from pathlib import Path
+ROOT = Path(__file__).parent
+setup(
+    name="search-autocomplete-engine",
+    version="0.1.0",
+    description="Trie-based search autocomplete engine with frequency ranking",
+    long_description=(ROOT / "README.md").read_text(encoding="utf-8"),
+    long_description_content_type="text/markdown",
+    author="Developer Jarvis",
+    author_email="developerjarvis@github.com",
+    url="https://github.com/DeveloperJarvis/search_autocomplete_engine",
+    license="GPL-3.0-or-later",
+    packages=find_packages(
+        exclude=["tests*", "examples*", "logs*"]
+    ),
+    python_requires=">=3.9",
+    install_requires=[
+        "typing-extensions>=4.0.0"
+    ],
+    extras_require={
+        "dev": [
+            "pytest",
+            "black",
+            "flake8",
+            "mypy",
+        ]
+    },
+    entry_points={
+        "console_scripts": [
+        ]
+    },
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: GNU General Public License v3 or later",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries",
+        "Topic :: Education",
+    ],
+    include_package_data=True,
+    zip_safe=False,
+)
+
+
+# config\__init__.py:
+"""
+Application-level configuration package.
+"""
+from .config import AppConfig
+__all__ = ["AppConfig"]
+
+
+# config\config.py:
+"""
+Top-level application configuration.
+This module wires application configuration with
+the core search autocomplete engine configuration.
+"""
+import os
+from dataclasses import dataclass
+from search_autocomplete_engine.config.engine_config import EngineConfig
+@dataclass(frozen=True)
+class AppConfig:
+    """
+    Root configuration object for the application.
+    """
+    engine: EngineConfig = EngineConfig()
+    LOG_LEVEL: str = "INFO"
+    PARENT_DIR: str = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+    LOG_FILE: str = os.path.join(
+        os.path.dirname(PARENT_DIR), "logs", "autocomplete.log"
+    )
+
+
+# examples\__init__.py:
+"""
+Example scripts for the Search Autocomplete Engine.
+"""
+
+
+# examples\basic_autocomplete.py:
+"""
+Basic autocomplete example.
+"""
+from search_autocomplete_engine import (
+    AutocompleteEngine, EngineConfig
+)
+def main() -> None:
+    config = EngineConfig(top_k=3)
+    engine = AutocompleteEngine(config)
+    engine.add_query("apple")
+    engine.add_query("app")
+    engine.add_query("application")
+    engine.add_query("banana")
+    prefix = "top"
+    suggestions = engine.suggest(prefix)
+    print(f"Suggestons for '{prefix}':")
+    for s in suggestions:
+        print(f" - {s}")
+if __name__ == "__main__":
+    main()
+
+
+# examples\frequency_demo.py:
+"""
+Frequency ranking demostration.
+"""
+from search_autocomplete_engine import (
+    AutocompleteEngine, EngineConfig
+)
+def main() -> None:
+    config = EngineConfig(top_k=3)
+    engine = AutocompleteEngine(config)
+    engine.add_query("python")
+    engine.add_query("python")
+    engine.add_query("python")
+    engine.add_query("pytest")
+    engine.add_query("pytest")
+    engine.add_query("pycharm")
+    prefix = "py"
+    suggestions = engine.suggest(prefix)
+    print("Frequency-based ranking:")
+    for s in suggestions:
+        print(f" - {s}")
+if __name__ == "__main__":
+    main()
+
+
+# examples\interactive_cli.py:
+"""
+Interactive CLI for the Search Autocomplete Engine.
+"""
+from search_autocomplete_engine import (
+    AutocompleteEngine, EngineConfig,
+)
+def main() -> None:
+    config = EngineConfig(top_k=5)
+    engine = AutocompleteEngine(config)
+    print("🔍 Search Autocomplete Engine")
+    print("Type queries to add them.")
+    print("Type '/suggest <prefix>' to get suggestions.")
+    print("Type '/exit' to quit.\n")
+    while True:
+        user_input = input("> ").strip()
+        if user_input == "/exit":
+            print("Goodbye 👋🏻")
+            break
+        if user_input.startswith("/suggest"):
+            parts = user_input.split(maxsplit=1)
+            if len(parts) != 2:
+                print("Usage: /suggest <prefix>")
+                continue
+            prefix = parts[1]
+            suggestions = engine.suggest(prefix)
+            print("Suggestions:")
+            for s in suggestions:
+                print(f" - {s}")
+        else:
+            engine.add_query(user_input)
+            print(f"Added query: '{user_input}'")
+if __name__ == "__main__":
+    main()
+
+
+# search_autocomplete_engine\__init__.py:
+"""
+Search Autocomplete Engine
+A Trie-based autocomplete engine with frequency-based ranking.
+"""
+from search_autocomplete_engine.core.autocomplete import AutocompleteEngine
+from search_autocomplete_engine.config.engine_config import EngineConfig
+__all__ = [
+    "AutocompleteEngine",
+    "EngineConfig",
+]
+
+
+# search_autocomplete_engine\config\__init__.py:
+"""
+Configuration for the Search Autocomplete Engine.
+"""
+from .engine_config import EngineConfig
+from .defaults import DEFAULT_TOP_K, DEFAULT_CASE_SENSITIVE
+__all__ = [
+    "EngineConfig",
+    "DEFAULT_TOP_K",
+    "DEFAULT_CASE_SENSITIVE",
+]
+
+
+# search_autocomplete_engine\config\defaults.py:
+"""
+Default configuration values for the autocomplete engine.
+"""
+DEFAULT_TOP_K: int = 5
+DEFAULT_CASE_SENSITIVE: bool = False
+
+
+# search_autocomplete_engine\config\engine_config.py:
+"""
+Engine configuration module.
+"""
+from dataclasses import dataclass
+from search_autocomplete_engine.config.defaults import (
+    DEFAULT_TOP_K,
+    DEFAULT_CASE_SENSITIVE,
+)
+from search_autocomplete_engine.exceptions.errors import InvalidTopKError
+@dataclass(frozen=True)
+class EngineConfig:
+    """
+    Configuration object for the autocomplete engine.
+    Attributes:
+        top_k (int): Number of suggestions to return
+        case_sensitive (bool): Case sensitivity flag
+    """
+    top_k: int = DEFAULT_TOP_K
+    case_sensitive: bool = DEFAULT_CASE_SENSITIVE
+    def __post_init__(self) -> None:
+        if self.top_k <= 0:
+            raise InvalidTopKError(
+                "top_k must be greater than zero"
+            )
+
+
+# search_autocomplete_engine\core\__init__.py:
+"""
+Core components of the Search Autocomplete Engine.
+"""
+from .autocomplete import AutocompleteEngine
+from .trie import Trie
+from .ranker import Ranker
+__all__ = ["AutocompleteEngine", "Trie", "Ranker"]
+
+
+# search_autocomplete_engine\core\autocomplete.py:
+"""
+Autocomplete engine implementation
+"""
+from search_autocomplete_engine.config.engine_config import EngineConfig
+from search_autocomplete_engine.core.trie import Trie
+from search_autocomplete_engine.core.ranker import Ranker
+from search_autocomplete_engine.storage.frequency_store import FrequencyStore
+from search_autocomplete_engine.utils.normalizer import normalize_query
+from search_autocomplete_engine.utils.validators import (
+    validate_query,
+    validate_prefix,
+)
+from search_autocomplete_engine.utils.logging import get_logger
+class AutocompleteEngine:
+    """
+    Trie-based search autocomplete engine.
+    """
+    def __init__(self, config: EngineConfig) -> None:
+        self.config = config
+        self._trie = Trie()
+        self._frequency_store = FrequencyStore()
+        self._ranker = Ranker(self._frequency_store)
+        self._logger = get_logger(self.__class__.__name__)
+    def add_query(self, query: str) -> None:
+        """
+        Add a query to the engine and update its frequency.
+        """
+        validate_query(query)
+        normalized = normalize_query(query)
+        if not normalized:
+            return
+        self._frequency_store.increment(normalized)
+        self._trie.insert(normalized)
+        self._logger.debug("Add query: %s", normalized)
+    def suggest(self, prefix: str) -> list[str]:
+        """
+        Return ranked autocomplete suggestions for a prefix.
+        """
+        validate_prefix(prefix)
+        normalized = normalize_query(prefix)
+        if not normalized:
+            return
+        queries = self._trie.get_queries_with_prefix(normalized)
+        suggestions = self._ranker.rank(
+            queries,
+            top_k=self.config.top_k,
+        )
+        self._logger.debug(
+            "Suggestions for '%s': %s", normalized, suggestions
+        )
+        return suggestions
+
+
+# search_autocomplete_engine\core\ranker.py:
+"""
+Ranking logic for autocomplete suggestions.
+"""
+from typing import List
+from search_autocomplete_engine.storage.frequency_store import FrequencyStore
+class Ranker:
+    """
+    Ranks queries based on frequency and lexicographical order.
+    """
+    def __init__(self, frquency_store: FrequencyStore) -> None:
+        self._frquency_store = frquency_store
+    def rank(self, queries: set[str], top_k: int) -> List[str]:
+        """
+        Rank queries by:
+        1. Frequency (descending)
+        2. Lexicographical order (ascending)
+        """
+        sorted_queries = sorted(
+            queries,
+            key=lambda q: (-self._frquency_store.get(q), q),
+        )
+        return sorted_queries[:top_k]
+
+
+# search_autocomplete_engine\core\trie.py:
+"""
+Trie implementation for prefix-based indexing.
+"""
+from search_autocomplete_engine.models.trie_node import TrieNode
+from search_autocomplete_engine.exceptions.errors import TrieError
+class Trie:
+    """
+    Trie data structure for storing query prefixes.
+    """
+    def __init__(self) -> None:
+        self.root = TrieNode()
+    def insert(self, query: str) -> None:
+        """
+        Insert a query into the table.
+        """
+        if not query:
+            raise TrieError("Cannot insert empty query")
+        node = self.root
+        for char in query:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+            node.queries.add(query)
+        node.is_end = True
+    def get_queries_with_prefix(self, prefix: str) -> set[str]:
+        """
+        Retrieve all queries matching a prefix.
+        """
+        node = self.root
+        for char in prefix:
+            if char not in node.children:
+                return set()
+            node = node.children[char]
+        return set(node.queries)
+
+
+# search_autocomplete_engine\exceptions\__init__.py:
+"""
+Custom exception hierarchy for the Search Autocomplete Engine.
+"""
+from .errors import (
+    AutocompleteEngineError,
+    InvalidQueryError,
+    InvalidPrefixError,
+    InvalidTopKError,
+    TrieError,
+    StorageError,
+)
+__all__ = [
+    "AutocompleteEngineError",
+    "InvalidQueryError",
+    "InvalidPrefixError",
+    "InvalidTopKError",
+    "TrieError",
+    "StorageError",
+]
+
+
+# search_autocomplete_engine\exceptions\errors.py:
+"""
+Custom exceptions for the Search Autocomplete Engine.
+"""
+class AutocompleteEngineError(Exception):
+    """
+    Base exception for all autocomplete engine errors.
+    """
+    pass
+class InvalidQueryError(AutocompleteEngineError):
+    """Raised when a search query is invalid."""
+    pass
+class InvalidPrefixError(AutocompleteEngineError):
+    """Raised when an autocomplete prefix is invalid."""
+    pass
+class InvalidTopKError(AutocompleteEngineError):
+    """Raised when top_k pararmeter is invalid."""
+    pass
+class TrieError(AutocompleteEngineError):
+    """Raised for trie-related errors."""
+    pass
+class StorageError(AutocompleteEngineError):
+    """Raised for frequency/ storage-related errors."""
+    pass
+
+
+# search_autocomplete_engine\models\__init__.py:
+"""
+Data models for the Search Autocomplete Engine.
+"""
+from .query import Query
+from .trie_node import TrieNode
+__all__ = ["Query", "TrieNode"]
+
+
+# search_autocomplete_engine\models\query.py:
+"""
+Query model.
+"""
+from dataclasses import dataclass, field
+@dataclass(order=True)
+class Query:
+    """
+    Represents a search query and its frequency.
+    """
+    text: str
+    frequency: int = field(default=0, compare=True)
+    def increment(self, count: int = 1) -> None:
+        """
+        Increment query frequency.
+        """
+        self.frequency += count
+
+
+# search_autocomplete_engine\models\trie_node.py:
+"""
+Trie node model.
+"""
+from typing import Dict, Set
+class TrieNode:
+    """
+    Node used in the Trie data structure.
+    """
+    __slots__ = ("children", "is_end", "queries")
+    def __init__(self) -> None:
+        self.children: Dict[str, "TrieNode"] = {}
+        self.is_end: bool = False
+        self.queries: Set[str] = set()
+
+
+# search_autocomplete_engine\storage\__init__.py:
+"""
+Storage layer for the Search Autocomplete Engine.
+"""
+from .frequency_store import FrequencyStore
+__all__ = ["FrequencyStore"]
+
+
+# search_autocomplete_engine\storage\frequency_store.py:
+"""
+Frequency storage for search queries.
+"""
+from typing import Dict
+from search_autocomplete_engine.exceptions.errors import StorageError
+class FrequencyStore:
+    """
+    In-memory store for query frequencies.
+    """
+    def __init__(self) -> None:
+        self._frequencies: Dict[str, int] = {}
+    def increment(self, query: str) -> int:
+        """
+        Increment frquency count for a query.
+        Returns:
+            int: Updated frequency
+        """
+        if not query:
+            raise StorageError("Query cannot be empty")
+        self._frequencies[query] = self._frequencies.get(
+                                                query, 0
+                                            ) + 1
+        return self._frequencies[query]
+    def get(self, query: str) -> int:
+        """
+        Get frequemcy for a query.
+        """
+        return self._frequencies.get(query, 0)
+    def all(self) -> Dict[str, int]:
+        """
+        Get all stored frequencies.
+        """
+        return dict(self._frequencies)
+
+
+# search_autocomplete_engine\utils\__init__.py:
+"""
+Utility helpers for the Search Autocomplete Engine.
+"""
+from .normalizer import normalize_query
+from .validators import (
+    validate_query, 
+    validate_prefix,
+    validate_top_k,
+)
+from .logging import get_logger
+__all__ = [
+    "normalize_query",
+    "validate_query",
+    "validate_prefix",
+    "validate_top_k",
+    "get_logger",
+]
+
+
+# search_autocomplete_engine\utils\logging.py:
+"""
+Logging utilities for the Scratch Autocomplete Engine.
+"""
+import logging
+import os
+from typing import Optional
+from config.config import AppConfig
+_LOGGERS = {}
+def get_logger(
+        name: str,
+        config: Optional[AppConfig] = None,
+    ) -> logging.Logger:
+    """
+    Get a configured logger instance.
+    Ensures:
+    - Singleton logger per name
+    - File + console logging
+    - Configuration via AppConfig
+    Args:
+        name (str): Logger name
+        config (AppConfig, optional): Application config
+    Returns:
+        logging.Logger
+    """
+    if name in _LOGGERS:
+        return _LOGGERS[name]
+    config = config or AppConfig()
+    logger = logging.getLogger(name)
+    logger.setLevel(config.LOG_LEVEL)
+    logger.propagate = False
+    formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s"
+    )
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    log_dir = os.path.dirname(config.LOG_FILE)
+    os.makedirs(log_dir, exist_ok=True)
+    file_handler = logging.FileHandler(config.LOG_FILE)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    _LOGGERS[name] = logger
+    return logger
+
+
+# search_autocomplete_engine\utils\normalizer.py:
+"""
+Query normalization utilities.
+"""
+def normalize_query(query: str) -> str:
+    """
+    Normalize a search query for consistent indexing.
+    Operations:
+    - Strip leading/trailing whitespace
+    - Convert to lowercase
+    Args:
+        query (str): Raw input query
+    Returns:
+        str: Normalized query
+    """
+    if query is None:
+        return ""
+    if not isinstance(query, str):
+        raise TypeError("Query must be a string")
+    return query.strip().lower()
+
+
+# search_autocomplete_engine\utils\validators.py:
+"""
+Validation helpers for inputs.
+"""
+from search_autocomplete_engine.exceptions.errors import (
+    InvalidQueryError,
+    InvalidPrefixError,
+    InvalidTopKError,
+)
+def validate_query(query: str) -> None:
+    """
+    Validate a full search query.
+    Raises:
+        InvalidQueryError
+    """
+    if not isinstance(query, str):
+        raise InvalidQueryError("Query must be a string")
+    if not query.strip():
+        raise InvalidQueryError("Query cannot be empty")
+def validate_prefix(prefix: str) -> None:
+    """
+    Validate autocomplete prefix.
+    Raises:
+        InvalidPrefixError
+    """
+    if not isinstance(prefix, str):
+        raise InvalidPrefixError("Prefix must be a string")
+    if not prefix.strip():
+        raise InvalidPrefixError("Prefix cannot be empty")
+def validate_top_k(top_k: int) -> None:
+    """
+    Validate top-k parameter.
+    Raises:
+        InvalidTopKError
+    """
+    if not isinstance(top_k, int):
+        raise InvalidTopKError("top_k must be an integer")
+    if top_k <= 0:
+        raise InvalidTopKError(
+            "top_k must be greater than zero"
+        )
+
+
+# tests\__init__.py:
+
+
+
+# tests\test_autocomplete.py:
+
+
+
+# tests\test_frequency_store.py:
+
+
+
+# tests\test_normalizer.py:
+
+
+
+# tests\test_ranker.py:
+
+
+
+# tests\test_trie.py:
+
+
+

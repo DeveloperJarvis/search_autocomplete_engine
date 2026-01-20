@@ -30,8 +30,69 @@
 # --------------------------------------------------
 # autocomplete MODULE
 # --------------------------------------------------
-
+"""
+Autocomplete engine implementation
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from search_autocomplete_engine.config.engine_config import EngineConfig
+from search_autocomplete_engine.core.trie import Trie
+from search_autocomplete_engine.core.ranker import Ranker
+from search_autocomplete_engine.storage.frequency_store import FrequencyStore
+from search_autocomplete_engine.utils.normalizer import normalize_query
+from search_autocomplete_engine.utils.validators import (
+    validate_query,
+    validate_prefix,
+)
+from search_autocomplete_engine.utils.logging import get_logger
 
+
+# --------------------------------------------------
+# autocomplete engine
+# --------------------------------------------------
+class AutocompleteEngine:
+    """
+    Trie-based search autocomplete engine.
+    """
+
+    def __init__(self, config: EngineConfig) -> None:
+        self.config = config
+        self._trie = Trie()
+        self._frequency_store = FrequencyStore()
+        self._ranker = Ranker(self._frequency_store)
+        self._logger = get_logger(self.__class__.__name__)
+    
+    def add_query(self, query: str) -> None:
+        """
+        Add a query to the engine and update its frequency.
+        """
+        validate_query(query)
+        normalized = normalize_query(query)
+        if not normalized:
+            return
+
+        self._frequency_store.increment(normalized)
+        self._trie.insert(normalized)
+
+        self._logger.debug("Add query: %s", normalized)
+    
+    def suggest(self, prefix: str) -> list[str]:
+        """
+        Return ranked autocomplete suggestions for a prefix.
+        """
+        validate_prefix(prefix)
+        normalized = normalize_query(prefix)
+        if not normalized:
+            return
+
+        queries = self._trie.get_queries_with_prefix(normalized)
+        suggestions = self._ranker.rank(
+            queries,
+            top_k=self.config.top_k,
+        )
+
+        self._logger.debug(
+            "Suggestions for '%s': %s", normalized, suggestions
+        )
+        return suggestions

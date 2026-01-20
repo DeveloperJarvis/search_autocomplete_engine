@@ -30,8 +30,38 @@
 # --------------------------------------------------
 # config MODULE
 # --------------------------------------------------
+"""
+Top-level application configuration.
 
+This module wires application configuration with
+the core search autocomplete engine configuration.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import os
+from dataclasses import dataclass
+from search_autocomplete_engine.config.engine_config import EngineConfig
+
+
+# --------------------------------------------------
+# app config
+# --------------------------------------------------
+@dataclass(frozen=True)
+class AppConfig:
+    """
+    Root configuration object for the application.
+    """
+    engine: EngineConfig = EngineConfig()
+
+    # Logging
+    LOG_LEVEL: str = "INFO"
+    PARENT_DIR: str = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..")
+    )
+    LOG_FILE: str = os.path.join(
+        os.path.dirname(PARENT_DIR), "logs", "autocomplete.log"
+    )
+
+
 

@@ -30,8 +30,36 @@
 # --------------------------------------------------
 # ranker MODULE
 # --------------------------------------------------
-
+"""
+Ranking logic for autocomplete suggestions.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from typing import List
 
+from search_autocomplete_engine.storage.frequency_store import FrequencyStore
+
+
+# --------------------------------------------------
+# ranker
+# --------------------------------------------------
+class Ranker:
+    """
+    Ranks queries based on frequency and lexicographical order.
+    """
+
+    def __init__(self, frquency_store: FrequencyStore) -> None:
+        self._frquency_store = frquency_store
+
+    def rank(self, queries: set[str], top_k: int) -> List[str]:
+        """
+        Rank queries by:
+        1. Frequency (descending)
+        2. Lexicographical order (ascending)
+        """
+        sorted_queries = sorted(
+            queries,
+            key=lambda q: (-self._frquency_store.get(q), q),
+        )
+        return sorted_queries[:top_k]

@@ -30,8 +30,27 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Custom exception hierarchy for the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .errors import (
+    AutocompleteEngineError,
+    InvalidQueryError,
+    InvalidPrefixError,
+    InvalidTopKError,
+    TrieError,
+    StorageError,
+)
 
+
+__all__ = [
+    "AutocompleteEngineError",
+    "InvalidQueryError",
+    "InvalidPrefixError",
+    "InvalidTopKError",
+    "TrieError",
+    "StorageError",
+]

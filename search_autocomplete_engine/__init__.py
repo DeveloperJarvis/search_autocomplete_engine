@@ -30,8 +30,19 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
+"""
+Search Autocomplete Engine
 
+A Trie-based autocomplete engine with frequency-based ranking.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from search_autocomplete_engine.core.autocomplete import AutocompleteEngine
+from search_autocomplete_engine.config.engine_config import EngineConfig
 
+
+__all__ = [
+    "AutocompleteEngine",
+    "EngineConfig",
+]

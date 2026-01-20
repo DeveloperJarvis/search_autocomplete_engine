@@ -30,8 +30,29 @@
 # --------------------------------------------------
 # query MODULE
 # --------------------------------------------------
-
+"""
+Query model.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from dataclasses import dataclass, field
 
+
+# --------------------------------------------------
+# query
+# --------------------------------------------------
+@dataclass(order=True)
+class Query:
+    """
+    Represents a search query and its frequency.
+    """
+
+    text: str
+    frequency: int = field(default=0, compare=True)
+
+    def increment(self, count: int = 1) -> None:
+        """
+        Increment query frequency.
+        """
+        self.frequency += count

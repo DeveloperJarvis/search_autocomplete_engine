@@ -30,8 +30,32 @@
 # --------------------------------------------------
 # normalizer MODULE
 # --------------------------------------------------
-
+"""
+Query normalization utilities.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
 
+
+def normalize_query(query: str) -> str:
+    """
+    Normalize a search query for consistent indexing.
+
+    Operations:
+    - Strip leading/trailing whitespace
+    - Convert to lowercase
+
+    Args:
+        query (str): Raw input query
+    
+    Returns:
+        str: Normalized query
+    """
+    if query is None:
+        return ""
+
+    if not isinstance(query, str):
+        raise TypeError("Query must be a string")
+    
+    return query.strip().lower()

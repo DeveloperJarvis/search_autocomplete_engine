@@ -30,8 +30,18 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Configuration for the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .engine_config import EngineConfig
+from .defaults import DEFAULT_TOP_K, DEFAULT_CASE_SENSITIVE
 
+
+__all__ = [
+    "EngineConfig",
+    "DEFAULT_TOP_K",
+    "DEFAULT_CASE_SENSITIVE",
+]

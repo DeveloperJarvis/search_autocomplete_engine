@@ -30,8 +30,13 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Storage layer for the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .frequency_store import FrequencyStore
 
+
+__all__ = ["FrequencyStore"]

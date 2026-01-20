@@ -30,8 +30,13 @@
 # --------------------------------------------------
 # defaults MODULE
 # --------------------------------------------------
-
+"""
+Default configuration values for the autocomplete engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
 
+
+DEFAULT_TOP_K: int = 5
+DEFAULT_CASE_SENSITIVE: bool = False

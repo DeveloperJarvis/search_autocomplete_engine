@@ -30,8 +30,15 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Core components of the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .autocomplete import AutocompleteEngine
+from .trie import Trie
+from .ranker import Ranker
 
+
+__all__ = ["AutocompleteEngine", "Trie", "Ranker"]

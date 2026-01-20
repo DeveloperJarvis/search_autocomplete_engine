@@ -30,8 +30,14 @@
 # --------------------------------------------------
 # __init__ MODULE
 # --------------------------------------------------
-
+"""
+Data models for the Search Autocomplete Engine.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from .query import Query
+from .trie_node import TrieNode
 
+
+__all__ = ["Query", "TrieNode"]

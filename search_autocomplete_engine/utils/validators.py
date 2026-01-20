@@ -30,8 +30,58 @@
 # --------------------------------------------------
 # validators MODULE
 # --------------------------------------------------
-
+"""
+Validation helpers for inputs.
+"""
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+from search_autocomplete_engine.exceptions.errors import (
+    InvalidQueryError,
+    InvalidPrefixError,
+    InvalidTopKError,
+)
 
+
+def validate_query(query: str) -> None:
+    """
+    Validate a full search query.
+
+    Raises:
+        InvalidQueryError
+    """
+    if not isinstance(query, str):
+        raise InvalidQueryError("Query must be a string")
+
+    if not query.strip():
+        raise InvalidQueryError("Query cannot be empty")
+
+
+def validate_prefix(prefix: str) -> None:
+    """
+    Validate autocomplete prefix.
+
+    Raises:
+        InvalidPrefixError
+    """
+    if not isinstance(prefix, str):
+        raise InvalidPrefixError("Prefix must be a string")
+
+    if not prefix.strip():
+        raise InvalidPrefixError("Prefix cannot be empty")
+
+
+def validate_top_k(top_k: int) -> None:
+    """
+    Validate top-k parameter.
+
+    Raises:
+        InvalidTopKError
+    """
+    if not isinstance(top_k, int):
+        raise InvalidTopKError("top_k must be an integer")
+
+    if top_k <= 0:
+        raise InvalidTopKError(
+            "top_k must be greater than zero"
+        )

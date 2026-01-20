@@ -34,4 +34,20 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from search_autocomplete_engine.utils.normalizer import normalize_query
 
+
+def test_normalize_basic():
+    assert normalize_query("  APPle ") == "apple"
+    assert normalize_query("PyTest") == "pytest"
+
+
+def test_normalize_empty_and_none():
+    assert normalize_query("") == ""
+    assert normalize_query(None) == ""
+
+
+def test_normalize_invalid_type_raises():
+    with pytest.raises(TypeError):
+        normalize_query(123)

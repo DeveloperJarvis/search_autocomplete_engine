@@ -34,4 +34,29 @@
 # --------------------------------------------------
 # imports
 # --------------------------------------------------
+import pytest
+from search_autocomplete_engine.storage.frequency_store import FrequencyStore
+from search_autocomplete_engine.exceptions.errors import StorageError
 
+
+def test_increment_and_get():
+    store = FrequencyStore()
+    assert store.increment("apple") == 1
+    assert store.increment("apple") == 2
+    assert store.get("apple") == 2
+    assert store.get("banana") == 0
+
+
+def test_all_returns_dict():
+    store = FrequencyStore()
+    store.increment("apple")
+    store.increment("banana")
+    store.increment("banana")
+    data = store.all()
+    assert data == {"apple": 1, "banana": 2}
+
+
+def test_increment_empty_query_raises():
+    store = FrequencyStore()
+    with pytest.raises(StorageError):
+        store.increment("")
